@@ -13,6 +13,8 @@ using Microsoft.OpenApi.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using OpenLockerWebApi.Models;
+using OpenLockerWebApi.Services;
+using OpenLockerWebApi.Services.UserService;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,8 +39,17 @@ namespace OpenLockerWebApi
                 Configuration.GetSection(nameof(OpenLockerDatabaseSettings))
             );
 
-            services.AddSingleton<IOpenLockerDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<OpenLockerDatabaseSettings>>().Value);
+
+            var section = Configuration.GetSection(nameof(OpenLockerDatabaseSettings));
+            var settings = IOpenLockerDatabaseSettings.FromSection(section);
+
+            Debug.WriteLine(settings);
+
+            var mongoClient = new MongoClient(settings.ConnectionString);
+            var database = mongoClient.GetDatabase(settings.DatabaseName);
+
+            services.AddSingleton(database);
+            services.AddScoped<IUserService, MongoUserService>();
 
             services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);

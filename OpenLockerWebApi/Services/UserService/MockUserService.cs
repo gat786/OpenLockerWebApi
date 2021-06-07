@@ -8,19 +8,17 @@ namespace OpenLockerWebApi.Services.UserService
 {
     public class MockUserService : IUserService
     {
-        
-
-        public void CreateUser(User user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateUser(User user)
+        public User CreateUser(User user)
         {
             throw new NotImplementedException();
         }
 
         public void DeleteUser(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<User> GetAllUsers()
         {
             throw new NotImplementedException();
         }
@@ -35,7 +33,7 @@ namespace OpenLockerWebApi.Services.UserService
             throw new NotImplementedException();
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public void UpdateUser(User user)
         {
             throw new NotImplementedException();
         }

@@ -8,7 +8,7 @@ namespace OpenLockerWebApi.Services.UserService
 {
     public interface IUserService
     {
-        void CreateUser(User user);
+        User CreateUser(User user);
         void UpdateUser(User user);
         void DeleteUser(User user);
         void GetUserByEmail(string emailAddress);

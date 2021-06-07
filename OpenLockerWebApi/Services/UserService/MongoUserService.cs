@@ -21,9 +21,10 @@ namespace OpenLockerWebApi.Services.UserService
             _userCollection = _database.GetCollection<User>("users");
         }
 
-        public void CreateUser(User user)
+        public User CreateUser(User user)
         {
             _userCollection.InsertOne(user);
+            return user;
         }
 
         public void DeleteUser(User user)

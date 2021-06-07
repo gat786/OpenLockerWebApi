@@ -35,15 +35,14 @@ namespace OpenLockerWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             services.Configure<OpenLockerDatabaseSettings>(
                 Configuration.GetSection(nameof(OpenLockerDatabaseSettings))
             );
 
-
             var section = Configuration.GetSection(nameof(OpenLockerDatabaseSettings));
             var settings = IOpenLockerDatabaseSettings.FromSection(section);
-
-            Debug.WriteLine(settings);
 
             var mongoClient = new MongoClient(settings.ConnectionString);
             var database = mongoClient.GetDatabase(settings.DatabaseName);

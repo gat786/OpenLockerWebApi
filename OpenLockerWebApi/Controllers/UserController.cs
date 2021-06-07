@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using OpenLockerWebApi.DTOs.User;
 using OpenLockerWebApi.Models;
 using OpenLockerWebApi.Services;
 using OpenLockerWebApi.Services.UserService;
@@ -17,20 +19,23 @@ namespace OpenLockerWebApi.Controllers
     public class UserController
     {
         private readonly IUserService _userService;
-        public UserController(IUserService service)
+        private readonly IMapper _mapper;
+
+        public UserController(IUserService service,IMapper mapper)
         {
             _userService = service;
+            _mapper = mapper;
         }
 
 
 
         [Route("register")]
         [HttpPost]
-        public string Register(User user)
+        public ActionResult<UserRead> Register(UserCreate userCreateBody)
         {
-            Debug.WriteLine(user);
-            _userService.CreateUser(user);
-            return "Thanks mate";
+            var user = _mapper.Map<User>(userCreateBody);
+            User insertedUser = _userService.CreateUser(user);
+            return new CreatedResult(insertedUser.id,_mapper.Map<UserRead>(user));
         }
 
         [Route("login")]

@@ -44,11 +44,12 @@ namespace OpenLockerWebApi.Controllers
 
         [Route("login")]
         [HttpPost]
-        public string Login(UserLogin loginCredentials)
+        public ActionResult Login(UserLogin loginCredentials)
         {
             User user = _userService.GetUserByUsername(loginCredentials.Username);
+            if (user == null) return new ForbidResult();
             var result = HashGenerator.ValidateHash(user, loginCredentials.Password);
-            return result ? "Login Successful" : "Login Failed";
+            return result ? new OkResult() : new ForbidResult();
         }
 
         [Route("")]

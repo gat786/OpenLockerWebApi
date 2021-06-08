@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using dotenv.net;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -37,6 +38,7 @@ namespace OpenLockerWebApi.Controllers
         {
             var user = _mapper.Map<User>(userCreateBody);
             var userFound = _userService.GetByEmailOrUsername(emailAddress: user.EmailAddress, username: user.Username);
+            // return a 422 if username or email address is already taken
             if (userFound != null) return new UnprocessableEntityResult();
             string passwordHash = HashGenerator.GenerateHash(user);
             user.Password = passwordHash;
@@ -49,9 +51,21 @@ namespace OpenLockerWebApi.Controllers
         public ActionResult Login(UserLogin loginCredentials)
         {
             User user = _userService.GetUserByUsername(loginCredentials.Username);
+            // return 403 if user doesn't exist
             if (user == null) return new ForbidResult();
             var result = HashGenerator.ValidateHash(user, loginCredentials.Password);
-            return result ? new OkResult() : new ForbidResult();
+            // return 403 if Password is not validated or else return Ok
+            if (result)
+            {
+                var userWithToken = _mapper.Map<UserRead>(user);
+                var jwtToken = JwtHelper.GenerateJwtToken(user);
+                userWithToken.AccessToken = jwtToken;
+                return new OkObjectResult(userWithToken);
+            }
+            else
+            {
+                return new ForbidResult();
+            }
         }
 
         [Route("")]

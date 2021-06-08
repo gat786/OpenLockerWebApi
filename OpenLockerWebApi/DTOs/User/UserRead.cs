@@ -16,5 +16,8 @@ namespace OpenLockerWebApi.DTOs.User
 
         [Required]
         public string EmailAddress { get; set; }
+
+        public string RefreshToken { get; set; }
+        public string AccessToken { get; set; }
     }
 }

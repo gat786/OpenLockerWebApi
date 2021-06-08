@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace OpenLockerWebApi.Helper
 {
-    public class JwtHelper
+    public static class JwtHelper
     {
-        private string generateJwtToken(User user)
+        public static string GenerateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JwtSigningKey"));
@@ -30,7 +30,7 @@ namespace OpenLockerWebApi.Helper
             return tokenHandler.WriteToken(token);
         }
 
-        private RefreshToken generateRefreshToken(string ipAddress)
+        public static RefreshToken GenerateRefreshToken(string ipAddress)
         {
             using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
             {

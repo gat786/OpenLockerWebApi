@@ -36,6 +36,8 @@ namespace OpenLockerWebApi.Controllers
         public ActionResult<UserRead> Register(UserCreate userCreateBody)
         {
             var user = _mapper.Map<User>(userCreateBody);
+            var userFound = _userService.GetByEmailOrUsername(emailAddress: user.EmailAddress, username: user.Username);
+            if (userFound != null) return new UnprocessableEntityResult();
             string passwordHash = HashGenerator.GenerateHash(user);
             user.Password = passwordHash;
             User insertedUser = _userService.CreateUser(user);

@@ -37,6 +37,11 @@ namespace OpenLockerWebApi.Services.UserService
             return _userCollection.Find("{}").Limit(10).ToCursor().ToEnumerable();
         }
 
+        public User GetByEmailOrUsername(string emailAddress, string username)
+        {
+            return _userCollection.Find<User>(user => user.Username == username || user.EmailAddress == emailAddress).FirstOrDefault();
+        }
+
         public User GetUserByEmail(string emailAddress)
         {
             throw new NotImplementedException();

@@ -11,8 +11,8 @@ namespace OpenLockerWebApi.Services.UserService
         User CreateUser(User user);
         void UpdateUser(User user);
         void DeleteUser(User user);
-        void GetUserByEmail(string emailAddress);
-        void GetUserByUsername(string userName);
+        User GetUserByEmail(string emailAddress);
+        User GetUserByUsername(string userName);
         IEnumerable<User> GetAllUsers();
     }
 }

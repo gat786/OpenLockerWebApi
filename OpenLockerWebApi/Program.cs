@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using dotenv;
+using dotenv.net;
 
 namespace OpenLockerWebApi
 {
@@ -13,6 +15,7 @@ namespace OpenLockerWebApi
     {
         public static void Main(string[] args)
         {
+            DotEnv.Load();
             CreateHostBuilder(args).Build().Run();
         }
 

@@ -37,14 +37,14 @@ namespace OpenLockerWebApi.Services.UserService
             return _userCollection.Find("{}").Limit(10).ToCursor().ToEnumerable();
         }
 
-        public void GetUserByEmail(string emailAddress)
+        public User GetUserByEmail(string emailAddress)
         {
             throw new NotImplementedException();
         }
 
-        public void GetUserByUsername(string userName)
+        public User GetUserByUsername(string userName)
         {
-            throw new NotImplementedException();
+            return _userCollection.Find<User>(user => user.Username == userName).FirstOrDefault();
         }
 
         public void UpdateUser(User user)

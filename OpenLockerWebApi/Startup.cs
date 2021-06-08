@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using OpenLockerWebApi.Helper;
 using OpenLockerWebApi.Models;
 using OpenLockerWebApi.Services;
 using OpenLockerWebApi.Services.UserService;
@@ -37,12 +38,7 @@ namespace OpenLockerWebApi
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            services.Configure<OpenLockerDatabaseSettings>(
-                Configuration.GetSection(nameof(OpenLockerDatabaseSettings))
-            );
-
-            var section = Configuration.GetSection(nameof(OpenLockerDatabaseSettings));
-            var settings = IOpenLockerDatabaseSettings.FromSection(section);
+            var settings = OpenLockerSettingsResolver.FromEnvironment();
 
             var mongoClient = new MongoClient(settings.ConnectionString);
             var database = mongoClient.GetDatabase(settings.DatabaseName);

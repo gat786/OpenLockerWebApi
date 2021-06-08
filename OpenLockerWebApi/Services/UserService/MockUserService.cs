@@ -23,12 +23,12 @@ namespace OpenLockerWebApi.Services.UserService
             throw new NotImplementedException();
         }
 
-        public void GetUserByEmail(string emailAddress)
+        public User GetUserByEmail(string emailAddress)
         {
             throw new NotImplementedException();
         }
 
-        public void GetUserByUsername(string userName)
+        public User GetUserByUsername(string userName)
         {
             throw new NotImplementedException();
         }

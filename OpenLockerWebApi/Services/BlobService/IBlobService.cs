@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace OpenLockerWebApi.Services.BlobService
 {
+    /// <summary>
+    /// Blob Service which has to be implemented by any blob service provider
+    /// Currently there is one one implementation of Blob Service and it is for Azure Blob Storage
+    /// </summary>
     public interface IBlobService
     {
         /// <summary>
@@ -49,5 +53,13 @@ namespace OpenLockerWebApi.Services.BlobService
         /// <param name="fileName">File Name for which you have to create upload uri</param>
         /// <returns>SasUri for the file which you can use to upload the file</returns>
         Uri GetUploadSasUri(BlobContainerClient client, string fileName = "");
+
+        /// <summary>
+        /// Delete a blob as specified by the file name
+        /// </summary>
+        /// <param name="client">Client for the container from which blob has to be deleted</param>
+        /// <param name="filename">File name with all the prefixes which is to be deleted</param>
+        /// <returns>Whether the delete process was successful or not</returns>
+        bool DeleteBlob(BlobContainerClient client, string filename);
     }
 }

@@ -57,7 +57,17 @@ namespace OpenLockerWebApi.Controllers
             User user = _userService.GetUserByUsername(User.FindFirstValue(ClaimTypes.Name));
             var containerClient = _blobService.GetContainerForUser(user);
             var downloadUri = _blobService.GetDownloadUrl(containerClient, downloadFileDto.FileName);
-            return new OkObjectResult($"{downloadUri.Scheme}://{downloadUri.Host}:{downloadUri.Port}{downloadUri.LocalPath}{downloadUri.Query}");
+            return new RedirectToPageResult($"{downloadUri.Scheme}://{downloadUri.Host}:{downloadUri.Port}{downloadUri.LocalPath}{downloadUri.Query}");
+        }
+
+        [Authorize]
+        [HttpPost("delete")]
+        public ActionResult DeleteBlob(DeleteBlobDto deleteBlobDto)
+        {
+            User user = _userService.GetUserByUsername(User.FindFirstValue(ClaimTypes.Name));
+            var containerClient = _blobService.GetContainerForUser(user);
+            var result = _blobService.DeleteBlob(containerClient, deleteBlobDto.FileName);
+            return Ok(); 
         }
     }
 }

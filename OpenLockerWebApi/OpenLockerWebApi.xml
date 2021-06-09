@@ -36,6 +36,16 @@
             </summary>
             <returns>Readable list of all registered users</returns>
         </member>
+        <member name="T:OpenLockerWebApi.DTOs.Blob.DeleteBlobDto">
+            <summary>
+            DTO to be received from user when a delete operation is to be performed
+            </summary>
+        </member>
+        <member name="P:OpenLockerWebApi.DTOs.Blob.DeleteBlobDto.FileName">
+            <summary>
+            File name which has to be deleted. Prefixes should be included in the filename
+            </summary>
+        </member>
         <member name="T:OpenLockerWebApi.DTOs.Blob.DownloadFileDto">
             <summary>
             File Details which is to be downloaded
@@ -169,6 +179,12 @@
             Class to store DatabaseSettings and load it from .env files
             </summary>
         </member>
+        <member name="T:OpenLockerWebApi.Services.BlobService.IBlobService">
+            <summary>
+            Blob Service which has to be implemented by any blob service provider
+            Currently there is one one implementation of Blob Service and it is for Azure Blob Storage
+            </summary>
+        </member>
         <member name="M:OpenLockerWebApi.Services.BlobService.IBlobService.CreateContainerForUser(OpenLockerWebApi.Models.User)">
             <summary>
             Every user will have a common root folder which will be considered as their locker
@@ -207,6 +223,14 @@
             <param name="client">Container client in which you have to upload the file</param>
             <param name="fileName">File Name for which you have to create upload uri</param>
             <returns>SasUri for the file which you can use to upload the file</returns>
+        </member>
+        <member name="M:OpenLockerWebApi.Services.BlobService.IBlobService.DeleteBlob(Azure.Storage.Blobs.BlobContainerClient,System.String)">
+            <summary>
+            Delete a blob as specified by the file name
+            </summary>
+            <param name="client">Client for the container from which blob has to be deleted</param>
+            <param name="filename">File name with all the prefixes which is to be deleted</param>
+            <returns>Whether the delete process was successful or not</returns>
         </member>
     </members>
 </doc>

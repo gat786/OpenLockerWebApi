@@ -42,6 +42,20 @@ namespace OpenLockerWebApi.Services.BlobService
 
         }
 
+        public bool DeleteBlob(BlobContainerClient client, string filename)
+        {
+            try
+            {
+                client.DeleteBlobIfExists(filename, DeleteSnapshotsOption.IncludeSnapshots);
+            }
+            catch (RequestFailedException exception)
+            {
+                Debug.WriteLine(exception);
+                return false;
+            }
+            return true;
+        }
+
         public BlobContainerClient GetContainerForUser(User user)
         {
             _blobClient.GetBlobContainerClient(user.Username.ToLower()).CreateIfNotExists();

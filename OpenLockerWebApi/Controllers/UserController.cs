@@ -14,12 +14,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http;
 
 namespace OpenLockerWebApi.Controllers
 {
     [ApiController]
     [Route("user")]
-    public class UserController
+    public class UserController: ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
@@ -58,8 +60,14 @@ namespace OpenLockerWebApi.Controllers
             if (result)
             {
                 var userWithToken = _mapper.Map<UserRead>(user);
+
                 var jwtToken = JwtHelper.GenerateJwtToken(user);
+
+                var ipAddress = GetIpAddress();
+                var refreshToken = JwtHelper.GenerateRefreshToken(ipAddress);
+
                 userWithToken.AccessToken = jwtToken;
+                userWithToken.RefreshToken = refreshToken;
                 return new OkObjectResult(userWithToken);
             }
             else
@@ -74,6 +82,14 @@ namespace OpenLockerWebApi.Controllers
         {
             var usersList = _userService.GetAllUsers();
             return new OkObjectResult(_mapper.Map<IEnumerable<UserRead>>(usersList));
+        }
+
+        private string GetIpAddress()
+        {
+            if (Request.Headers.ContainsKey("X-Forwarded-For"))
+                return Request.Headers["X-Forwarded-For"];
+            else
+                return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
         }
     }
 }

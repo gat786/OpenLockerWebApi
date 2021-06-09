@@ -15,7 +15,7 @@ namespace OpenLockerWebApi.Controllers
     {
         private readonly IUserService service;
 
-        BlobController(IUserService service)
+        public BlobController(IUserService service)
         {
             this.service = service;
         }

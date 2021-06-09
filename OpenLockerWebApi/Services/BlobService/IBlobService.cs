@@ -38,15 +38,14 @@ namespace OpenLockerWebApi.Services.BlobService
         /// file
         /// </summary>
         /// <param name="client">Blob Container Client for the appropriate container</param>
-        /// <param name="filePath">File that you want to download</param>
+        /// <param name="fileName">File that you want to download</param>
         /// <returns>URL with appended token to download file</returns>
-        Uri GetDownloadUrl(BlobContainerClient client,string filePath);
+        Uri GetDownloadUrl(BlobContainerClient client,string fileName);
 
         /// <summary>
         /// Get Upload SasUri for a file
         /// </summary>
         /// <param name="client">Container client in which you have to upload the file</param>
-        /// <param name="filePrefix">file prefix at which you want to upload the file</param>
         /// <param name="fileName">File Name for which you have to create upload uri</param>
         /// <returns>SasUri for the file which you can use to upload the file</returns>
         Uri GetUploadSasUri(BlobContainerClient client, string fileName = "");

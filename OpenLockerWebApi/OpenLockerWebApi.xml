@@ -36,6 +36,16 @@
             </summary>
             <returns>Readable list of all registered users</returns>
         </member>
+        <member name="T:OpenLockerWebApi.DTOs.Blob.DownloadFileDto">
+            <summary>
+            File Details which is to be downloaded
+            </summary>
+        </member>
+        <member name="P:OpenLockerWebApi.DTOs.Blob.DownloadFileDto.FileName">
+            <summary>
+            name of the file prefixes included from the root of the container
+            </summary>
+        </member>
         <member name="T:OpenLockerWebApi.DTOs.Blob.File">
             <summary>
             File Information to be returned back to the user
@@ -187,7 +197,7 @@
             file
             </summary>
             <param name="client">Blob Container Client for the appropriate container</param>
-            <param name="filePath">File that you want to download</param>
+            <param name="fileName">File that you want to download</param>
             <returns>URL with appended token to download file</returns>
         </member>
         <member name="M:OpenLockerWebApi.Services.BlobService.IBlobService.GetUploadSasUri(Azure.Storage.Blobs.BlobContainerClient,System.String)">
@@ -195,7 +205,6 @@
             Get Upload SasUri for a file
             </summary>
             <param name="client">Container client in which you have to upload the file</param>
-            <param name="filePrefix">file prefix at which you want to upload the file</param>
             <param name="fileName">File Name for which you have to create upload uri</param>
             <returns>SasUri for the file which you can use to upload the file</returns>
         </member>

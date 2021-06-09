@@ -49,17 +49,18 @@ namespace OpenLockerWebApi.Services.BlobService
             return client;
         }
 
-        public Uri GetDownloadUrl(BlobContainerClient client, string filePath)
+        public Uri GetDownloadUrl(BlobContainerClient client, string fileName)
         {
+            var blobClient = client.GetBlobClient(fileName);
             BlobSasBuilder builder = new BlobSasBuilder()
             {
                 BlobContainerName = client.Name,
-                BlobName = filePath,
+                BlobName = fileName,
                 Resource = "b"
             };
             builder.ExpiresOn = DateTime.UtcNow.AddHours(2);
             builder.SetPermissions(BlobSasPermissions.Read);
-            return client.GenerateSasUri(builder);
+            return blobClient.GenerateSasUri(builder);
         }
 
         public HierarchealContent GetFiles(BlobContainerClient client, string prefix = "")

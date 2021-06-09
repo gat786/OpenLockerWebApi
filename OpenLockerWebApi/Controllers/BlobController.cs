@@ -52,12 +52,12 @@ namespace OpenLockerWebApi.Controllers
 
         [Authorize]
         [HttpPost("download")]
-        public ActionResult GetDownloadUrl(string filename)
+        public ActionResult GetDownloadUrl(DownloadFileDto downloadFileDto)
         {
             User user = _userService.GetUserByUsername(User.FindFirstValue(ClaimTypes.Name));
             var containerClient = _blobService.GetContainerForUser(user);
-            var downloadUri = _blobService.GetDownloadUrl(containerClient, filename);
-            return Ok(filename);
+            var downloadUri = _blobService.GetDownloadUrl(containerClient, downloadFileDto.FileName);
+            return new OkObjectResult($"{downloadUri.Scheme}://{downloadUri.Host}:{downloadUri.Port}{downloadUri.LocalPath}{downloadUri.Query}");
         }
     }
 }

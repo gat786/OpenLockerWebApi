@@ -15,7 +15,7 @@ namespace OpenLockerWebApi.Services.BlobService
         /// </summary>
         /// <param name="user">User for which you have to create a storage folder</param>
         /// <returns>Name of the root folder</returns>
-        string CreateContainerForUser(User user);
+        BlobContainerClient CreateContainerForUser(User user);
 
         /// <summary>
         /// Get Container in which user files are stored
@@ -30,7 +30,7 @@ namespace OpenLockerWebApi.Services.BlobService
         /// <param name="user">User for which you have to create a storage folder</param>
         /// <param name="prefix">Prefix from where you want to list your files</param>
         /// <returns>List of BlobItem in the given folder</returns>
-        IEnumerable<BlobItem> GetFiles(BlobContainerClient client,string prefix);
+        IEnumerable<BlobItem> GetFiles(BlobContainerClient client,string prefix = "");
 
         /// <summary>
         /// Generates SAS token for the file with READ perms and returns url to download the

@@ -26,6 +26,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
+using Azure.Storage.Blobs;
+using OpenLockerWebApi.Services.BlobService;
 
 namespace OpenLockerWebApi
 {
@@ -65,11 +67,15 @@ namespace OpenLockerWebApi
             var settings = OpenLockerSettingsResolver.FromEnvironment();
             //services.Configure<OpenLockerSettings>(settings);
 
+            var blobServiceClient = new BlobServiceClient(settings.BlobStorageConnectionString);
+
             var mongoClient = new MongoClient(settings.MongoDbConnectionString);
             var database = mongoClient.GetDatabase(settings.DatabaseName);
 
+            services.AddSingleton(blobServiceClient);
             services.AddSingleton(database);
-            
+
+            services.AddScoped<IBlobService, BlobServiceImpl>();
             services.AddScoped<IUserService, MongoUserService>();
 
             services.AddControllers()

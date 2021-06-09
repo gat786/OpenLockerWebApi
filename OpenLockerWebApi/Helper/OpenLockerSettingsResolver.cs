@@ -16,7 +16,9 @@ namespace OpenLockerWebApi.Helper
             var openLockerSettings = new OpenLockerSettings
             {
                 DatabaseName = Environment.GetEnvironmentVariable(nameof(OpenLockerSettings.DatabaseName)),
-                ConnectionString = Environment.GetEnvironmentVariable(nameof(OpenLockerSettings.ConnectionString))
+                MongoDbConnectionString = Environment.GetEnvironmentVariable(nameof(OpenLockerSettings.MongoDbConnectionString)),
+                JwtSigningKey = Environment.GetEnvironmentVariable(nameof(OpenLockerSettings.JwtSigningKey)),
+                BlobStorageConnectionString = Environment.GetEnvironmentVariable(nameof(OpenLockerSettings.BlobStorageConnectionString)),
             };
             return openLockerSettings;
         }

@@ -63,11 +63,13 @@ namespace OpenLockerWebApi
             });
 
             var settings = OpenLockerSettingsResolver.FromEnvironment();
+            //services.Configure<OpenLockerSettings>(settings);
 
-            var mongoClient = new MongoClient(settings.ConnectionString);
+            var mongoClient = new MongoClient(settings.MongoDbConnectionString);
             var database = mongoClient.GetDatabase(settings.DatabaseName);
 
             services.AddSingleton(database);
+            
             services.AddScoped<IUserService, MongoUserService>();
 
             services.AddControllers()

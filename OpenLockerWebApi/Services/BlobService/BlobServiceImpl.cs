@@ -1,6 +1,10 @@
 ﻿using Azure;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
+using Microsoft.AspNetCore.Mvc;
+using OpenLockerWebApi.DTOs.Blob;
 using OpenLockerWebApi.Models;
 using OpenLockerWebApi.Services.UserService;
 using System;
@@ -45,16 +49,43 @@ namespace OpenLockerWebApi.Services.BlobService
             return client;
         }
 
-        public string GetDownloadUrl(BlobContainerClient client, string filePath)
+        public Uri GetDownloadUrl(BlobContainerClient client, string filePath)
         {
-            throw new NotImplementedException();
+            BlobSasBuilder builder = new BlobSasBuilder()
+            {
+                BlobContainerName = client.Name,
+                BlobName = filePath,
+                Resource = "b"
+            };
+            builder.ExpiresOn = DateTime.UtcNow.AddHours(2);
+            builder.SetPermissions(BlobSasPermissions.Read);
+            return client.GenerateSasUri(builder);
         }
 
-        public IEnumerable<BlobItem> GetFiles(BlobContainerClient client, string prefix = "")
+        public HierarchealContent GetFiles(BlobContainerClient client, string prefix = "")
         {
             var blobs = client.GetBlobsByHierarchy(prefix: prefix, delimiter: "/") as IEnumerable<BlobHierarchyItem>;
-            var blobItems = blobs.Select(blobHierarchyItem => blobHierarchyItem.Blob);
-            return blobItems;
+            var hirarchealData = new HierarchealContent();
+            hirarchealData.FromBlobHierarchyItem(blobs.ToList());
+            return hirarchealData;
+        }
+
+        public Uri GetUploadSasUri(BlobContainerClient client, string fileName = "")
+        {
+            var blobClient = client.GetBlobClient(fileName);
+            if (blobClient != null && blobClient.CanGenerateSasUri)
+            {
+                BlobSasBuilder builder = new()
+                {
+                    BlobContainerName = client.Name,
+                    BlobName = fileName,
+                    Resource = "b"
+                };
+                builder.ExpiresOn = DateTime.UtcNow.AddHours(2);
+                builder.SetPermissions(BlobSasPermissions.Create | BlobSasPermissions.Write);
+                return blobClient.GenerateSasUri(builder);
+            }
+            return null;
         }
     }
 }

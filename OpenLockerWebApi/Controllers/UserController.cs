@@ -16,24 +16,36 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http;
+using OpenLockerWebApi.DTOs;
 
 namespace OpenLockerWebApi.Controllers
 {
+    /// <summary>
+    /// Api Controller for all the User related fields such as register, login
+    /// </summary>
     [ApiController]
     [Route("user")]
-    public class UserController: ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public UserController(IUserService service,IMapper mapper)
+        /// <summary>
+        /// Default Constructor which is designed to work with DI of this project
+        /// </summary>
+        /// <param name="_userService">Implementation of the IUserService received from the DI container</param>
+        /// <param name="mapper">Implementation of Automapper also received from the DI container</param>
+        public UserController(IUserService _userService, IMapper mapper)
         {
-            _userService = service;
+            this._userService = _userService;
             _mapper = mapper;
         }
 
-
-
+        /// <summary>
+        /// Controller to Enable Registration of users
+        /// </summary>
+        /// <param name="userCreateBody">Necessary Data for registering a user</param>
+        /// <returns>CreatedResult if a success UnprocessableEntityResult if not successful</returns>
         [Route("register")]
         [HttpPost]
         public ActionResult<UserRead> Register(UserCreate userCreateBody)
@@ -41,13 +53,22 @@ namespace OpenLockerWebApi.Controllers
             var user = _mapper.Map<User>(userCreateBody);
             var userFound = _userService.GetByEmailOrUsername(emailAddress: user.EmailAddress, username: user.Username);
             // return a 422 if username or email address is already taken
-            if (userFound != null) return new UnprocessableEntityResult();
+            if (userFound != null)
+            {
+                var failedResponse = new StandardResponse { Success = false, Message = "Username or Email Address is already taken" };
+                return new UnprocessableEntityObjectResult(failedResponse);
+            };
             string passwordHash = HashGenerator.GenerateHash(user);
             user.Password = passwordHash;
             User insertedUser = _userService.CreateUser(user);
-            return new CreatedResult(insertedUser.id,_mapper.Map<UserRead>(user));
+            return new CreatedResult(insertedUser.id, _mapper.Map<UserRead>(user));
         }
 
+        /// <summary>
+        /// Route to Facilitate User Login and generate JWT token as well as refresh token for authorised users
+        /// </summary>
+        /// <param name="loginCredentials">Username and Password for the user</param>
+        /// <returns>Ok if it was successfull or ForbiddenResult if failed</returns>
         [Route("login")]
         [HttpPost]
         public ActionResult Login(UserLogin loginCredentials)
@@ -68,7 +89,14 @@ namespace OpenLockerWebApi.Controllers
 
                 userWithToken.AccessToken = jwtToken;
                 userWithToken.RefreshToken = refreshToken;
-                return new OkObjectResult(userWithToken);
+
+                var SuccessFulResponse = new StandardResponse
+                {
+                    Success = true,
+                    Message = "Successfully Logged In",
+                    Data = userWithToken
+                };
+                return new OkObjectResult(SuccessFulResponse);
             }
             else
             {
@@ -76,12 +104,21 @@ namespace OpenLockerWebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Get a list of all registered Users
+        /// </summary>
+        /// <returns>Readable list of all registered users</returns>
         [Route("")]
         [HttpGet]
         public ActionResult<IEnumerable<UserRead>> GetUsers()
         {
             var usersList = _userService.GetAllUsers();
-            return new OkObjectResult(_mapper.Map<IEnumerable<UserRead>>(usersList));
+            var SuccessfulResponse = new StandardResponse
+            {
+                Success = true,
+                Data = _mapper.Map<IEnumerable<UserRead>>(usersList)
+            };
+            return new OkObjectResult(SuccessfulResponse);
         }
 
         private string GetIpAddress()

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Net.Http.Headers;
+using OpenLockerWebApi.DTOs;
 using OpenLockerWebApi.DTOs.Blob;
 using OpenLockerWebApi.DTOs.User;
 using OpenLockerWebApi.Models;
@@ -57,7 +58,22 @@ namespace OpenLockerWebApi.Controllers
             User user = _userService.GetUserByUsername(User.FindFirstValue(ClaimTypes.Name));
             var containerClient = _blobService.GetContainerForUser(user);
             var downloadUri = _blobService.GetDownloadUrl(containerClient, downloadFileDto.FileName);
-            return new RedirectToPageResult($"{downloadUri.Scheme}://{downloadUri.Host}:{downloadUri.Port}{downloadUri.LocalPath}{downloadUri.Query}");
+            if (downloadUri != null)
+            {
+                var result = new StandardResponse
+                {
+                    Success = true,
+                    Data = $"{downloadUri.Scheme}://{downloadUri.Host}:{downloadUri.Port}{downloadUri.LocalPath}{downloadUri.Query}"
+                };
+                return new OkObjectResult(result);
+            }
+
+            var failedResult = new StandardResponse
+            {
+                Success = false,
+                Message = "Creation of the url failed. Check whether the file really exists or you passed correct details"
+            };
+            return new BadRequestObjectResult(failedResult);
         }
 
         [Authorize]

@@ -74,7 +74,16 @@ namespace OpenLockerWebApi.Services.BlobService
             };
             builder.ExpiresOn = DateTime.UtcNow.AddHours(2);
             builder.SetPermissions(BlobSasPermissions.Read);
-            return blobClient.GenerateSasUri(builder);
+            try
+            {
+                return blobClient.GenerateSasUri(builder);
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e);
+                return null;
+            }
+
         }
 
         public HierarchealContent GetFiles(BlobContainerClient client, string prefix = "")

@@ -15,8 +15,64 @@
             Constructor loading userservice and blobservice from the DI controller
             DI -> Dependency Injection
             </summary>
-            <param name="userService"></param>
-            <param name="blobService"></param>
+            <param name="userService">Implementation of IUserService</param>
+            <param name="blobService">Implementation of IBlobService</param>
+        </member>
+        <member name="M:OpenLockerWebApi.Controllers.BlobController.GetFiles(OpenLockerWebApi.DTOs.Blob.GetFilesDto)">
+            <summary>
+            Get files inside a folder. 
+            </summary>
+            <param name="getFilesDto">Get Files specific details</param>
+            <remarks>
+            How to Call:
+                GET /blob
+            </remarks>
+            <returns></returns>
+        </member>
+        <member name="M:OpenLockerWebApi.Controllers.BlobController.GetUploadFileUri(OpenLockerWebApi.DTOs.Blob.GetUploadFileUriRequest)">
+            <summary>
+            Get Upload URI for a file
+            </summary>
+            <remarks>
+            How to Call:
+                POST /blob/upload
+            Sample Request: 
+                {
+                    "FileName":"path/to/file/filename.jpg"
+                }
+            </remarks>
+            <param name="uploadFileUriProps">Props required to fulfil this request</param>
+            <returns>Uri which can be used in a put request with file as a body to upload the file to storage</returns>
+        </member>
+        <member name="M:OpenLockerWebApi.Controllers.BlobController.GetDownloadUrl(OpenLockerWebApi.DTOs.Blob.DownloadFileDto)">
+            <summary>
+            Route to get Download uri for a file from the blob storage
+            </summary>
+            <remarks>
+            How to Call:
+                POST /blob/download
+            Sample Request:
+                {
+                    "FileName":"path/to/file/filename.jpg"
+                }
+            </remarks>
+            <param name="downloadFileDto">Props required to fulfil this request</param>
+            <returns>Download uri that can be used to download specified file</returns>
+        </member>
+        <member name="M:OpenLockerWebApi.Controllers.BlobController.DeleteBlob(OpenLockerWebApi.DTOs.Blob.DeleteBlobDto)">
+            <summary>
+            API endpoint to Delete a particular blob
+            </summary>
+            <remarks>
+            How to Call:
+                POST /blob/delete
+            Sample Request:
+                {
+                    "FileName":"path/to/file/filename.jpg"
+                }
+            </remarks>
+            <param name="deleteBlobDto"></param>
+            <returns></returns>
         </member>
         <member name="T:OpenLockerWebApi.Controllers.UserController">
             <summary>

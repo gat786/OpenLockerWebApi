@@ -35,23 +35,50 @@ namespace OpenLockerWebApi.Controllers
         /// Constructor loading userservice and blobservice from the DI controller
         /// DI -> Dependency Injection
         /// </summary>
-        /// <param name="userService"></param>
-        /// <param name="blobService"></param>
+        /// <param name="userService">Implementation of IUserService</param>
+        /// <param name="blobService">Implementation of IBlobService</param>
         public BlobController(IUserService userService, IBlobService blobService)
         {
             _userService = userService;
             _blobService = blobService;
         }
 
+        /// <summary>
+        /// Get files inside a folder. 
+        /// </summary>
+        /// <param name="getFilesDto">Get Files specific details</param>
+        /// <remarks>
+        /// How to Call:
+        ///     GET /blob
+        /// </remarks>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("")]
         public ActionResult GetFiles(GetFilesDto getFilesDto)
         {
             User user = _userService.GetUserByUsername(User.FindFirstValue(ClaimTypes.Name));
             var containerClient = _blobService.GetContainerForUser(user);
-            return new OkObjectResult(_blobService.GetFiles(containerClient,getFilesDto.Prefix));
+            var response = new StandardResponse
+            {
+                Success = true,
+                Data = _blobService.GetFiles(containerClient, getFilesDto.Prefix)
+            };
+            return new OkObjectResult(response);
         }
 
+        /// <summary>
+        /// Get Upload URI for a file
+        /// </summary>
+        /// <remarks>
+        /// How to Call:
+        ///     POST /blob/upload
+        /// Sample Request: 
+        ///     {
+        ///         "FileName":"path/to/file/filename.jpg"
+        ///     }
+        /// </remarks>
+        /// <param name="uploadFileUriProps">Props required to fulfil this request</param>
+        /// <returns>Uri which can be used in a put request with file as a body to upload the file to storage</returns>
         [Authorize]
         [HttpPost("upload")]
         public ActionResult GetUploadFileUri(GetUploadFileUriRequest uploadFileUriProps)
@@ -62,6 +89,19 @@ namespace OpenLockerWebApi.Controllers
             return new OkObjectResult($"{uploadUri.Scheme}://{uploadUri.Host}:{uploadUri.Port}{uploadUri.LocalPath}{uploadUri.Query}");
         }
 
+        /// <summary>
+        /// Route to get Download uri for a file from the blob storage
+        /// </summary>
+        /// <remarks>
+        /// How to Call:
+        ///     POST /blob/download
+        /// Sample Request:
+        ///     {
+        ///         "FileName":"path/to/file/filename.jpg"
+        ///     }
+        /// </remarks>
+        /// <param name="downloadFileDto">Props required to fulfil this request</param>
+        /// <returns>Download uri that can be used to download specified file</returns>
         [Authorize]
         [HttpPost("download")]
         public ActionResult GetDownloadUrl(DownloadFileDto downloadFileDto)
@@ -87,6 +127,19 @@ namespace OpenLockerWebApi.Controllers
             return new BadRequestObjectResult(failedResult);
         }
 
+        /// <summary>
+        /// API endpoint to Delete a particular blob
+        /// </summary>
+        /// <remarks>
+        /// How to Call:
+        ///     POST /blob/delete
+        /// Sample Request:
+        ///     {
+        ///         "FileName":"path/to/file/filename.jpg"
+        ///     }
+        /// </remarks>
+        /// <param name="deleteBlobDto"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPost("delete")]
         public ActionResult DeleteBlob(DeleteBlobDto deleteBlobDto)

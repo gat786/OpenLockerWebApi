@@ -108,6 +108,15 @@ namespace OpenLockerWebApi.Controllers
         /// <summary>
         /// Route to Facilitate User Login and generate JWT token as well as refresh token for authorised users
         /// </summary>
+        /// <remarks>
+        /// How to Call:
+        ///     POST /user/login
+        /// Sample Request:
+        ///     {
+        ///         "Username": "gat786"
+        ///         "Password": "SomeSecretPassword3423@!"
+        ///     }
+        /// </remarks>
         /// <param name="loginCredentials">Username and Password for the user</param>
         /// <returns>Ok if it was successfull or ForbiddenResult if failed</returns>
         [Route("login")]
@@ -129,6 +138,28 @@ namespace OpenLockerWebApi.Controllers
                 };
 
                 userWithToken.AccessToken = jwtToken;
+                if(user.RefreshToken.IsExpired)
+                {
+                    var ipAddress = GetIpAddress();
+                    var newRefreshToken = JwtHelper.GenerateRefreshToken(ipAddress);
+                    string newJwtToken = JwtHelper.GenerateJwtToken(user);
+                    UserRead userRead = new UserRead
+                    {
+                        Username = user.Username,
+                        EmailAddress = user.EmailAddress,
+                        AccessToken = newJwtToken,
+                        RefreshToken = newRefreshToken
+                    };
+
+                    StandardResponse response = new StandardResponse
+                    {
+                        Success = true,
+                        Message = "User Logged In Successfully",
+                        Data = userRead
+                    };
+                    return new OkObjectResult(response);
+                }
+
                 userWithToken.RefreshToken = user.RefreshToken;
 
                 setTokenCookie(userWithToken.RefreshToken.Token);
@@ -150,8 +181,13 @@ namespace OpenLockerWebApi.Controllers
         /// <summary>
         /// Get a list of all registered Users
         /// </summary>
+        /// <remarks>
+        /// How to Call:
+        ///     GET /user/
+        /// </remarks>
         /// <returns>Readable list of all registered users</returns>
         [Route("")]
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<UserRead>> GetUsers()
         {
@@ -164,6 +200,17 @@ namespace OpenLockerWebApi.Controllers
             return new OkObjectResult(SuccessfulResponse);
         }
 
+        /// <summary>
+        /// Get Access Token and also refresh token when you already have refresh token cookie
+        /// </summary>
+        /// <remarks>
+        ///     Add refreshToken cookie to while making this request
+        /// </remarks>
+        /// <response code="200">Tokens are returned successfully</response>
+        /// <response code="403">Refresh token has expired and you need to call the login api</response>
+        /// <returns>
+        /// Valid Access and refresh tokens
+        /// </returns>
         [AllowAnonymous]
         [HttpPost("get-new-tokens")]
         public ActionResult GetAccessToken()
@@ -193,23 +240,7 @@ namespace OpenLockerWebApi.Controllers
             }
             else
             {
-                var newRefreshToken = JwtHelper.GenerateRefreshToken(ipAddress);
-                var jwtToken = JwtHelper.GenerateJwtToken(user);
-                UserRead userRead = new UserRead
-                {
-                    Username = user.Username,
-                    EmailAddress = user.EmailAddress,
-                    AccessToken = jwtToken,
-                    RefreshToken = newRefreshToken
-                };
-
-                StandardResponse response = new StandardResponse
-                {
-                    Success = true,
-                    Message = "User Logged In Successfully",
-                    Data = userRead
-                };
-                return new OkObjectResult(response);
+                return new BadRequestObjectResult(new StandardResponse{ Success = false, Message = "Refresh token has expired you need to relogin" });
             }
         }
 

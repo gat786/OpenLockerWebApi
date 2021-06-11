@@ -28,6 +28,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Azure.Storage.Blobs;
 using OpenLockerWebApi.Services.BlobService;
+using System.Reflection;
+using System.IO;
 
 namespace OpenLockerWebApi
 {
@@ -96,6 +98,11 @@ namespace OpenLockerWebApi
                         Url = new Uri("https://gats.dev")
                     }
                 });
+
+                // Set the comments path for the Swagger JSON and UI.    
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

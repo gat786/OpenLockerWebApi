@@ -46,6 +46,17 @@ namespace OpenLockerWebApi.Controllers
         /// <summary>
         /// Controller to Enable Registration of users
         /// </summary>
+        /// <remarks>
+        /// How to Call:
+        ///     POST /user/register
+        /// 
+        /// Sample Request:
+        ///     {
+        ///         "UserName": "GoodUserName",
+        ///         "EmailAddress": "Email@server.com",
+        ///         "Password": "SomeVeryLongPassword428@"
+        ///     }
+        /// </remarks>
         /// <param name="userCreateBody">Necessary Data for registering a user</param>
         /// <returns>CreatedResult if a success UnprocessableEntityResult if not successful</returns>
         [Route("register")]

@@ -19,13 +19,24 @@ using System.Threading.Tasks;
 
 namespace OpenLockerWebApi.Controllers
 {
+    /// <summary>
+    /// A controller to Control all the api calls related to blob storage
+    /// Authentication is required for all the calls intended to be done through this controller.
+    /// </summary>
     [ApiController]
+    [Authorize]
     [Route("blob")]
     public class BlobController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IBlobService _blobService;
 
+        /// <summary>
+        /// Constructor loading userservice and blobservice from the DI controller
+        /// DI -> Dependency Injection
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="blobService"></param>
         public BlobController(IUserService userService, IBlobService blobService)
         {
             _userService = userService;

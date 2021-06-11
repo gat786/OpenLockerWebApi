@@ -4,6 +4,20 @@
         <name>OpenLockerWebApi</name>
     </assembly>
     <members>
+        <member name="T:OpenLockerWebApi.Controllers.BlobController">
+            <summary>
+            A controller to Control all the api calls related to blob storage
+            Authentication is required for all the calls intended to be done through this controller.
+            </summary>
+        </member>
+        <member name="M:OpenLockerWebApi.Controllers.BlobController.#ctor(OpenLockerWebApi.Services.UserService.IUserService,OpenLockerWebApi.Services.BlobService.IBlobService)">
+            <summary>
+            Constructor loading userservice and blobservice from the DI controller
+            DI -> Dependency Injection
+            </summary>
+            <param name="userService"></param>
+            <param name="blobService"></param>
+        </member>
         <member name="T:OpenLockerWebApi.Controllers.UserController">
             <summary>
             Api Controller for all the User related fields such as register, login
@@ -20,6 +34,17 @@
             <summary>
             Controller to Enable Registration of users
             </summary>
+            <remarks>
+            How to Call:
+                POST /user/register
+            
+            Sample Request:
+                {
+                    "UserName": "GoodUserName",
+                    "EmailAddress": "Email@server.com",
+                    "Password": "SomeVeryLongPassword428@"
+                }
+            </remarks>
             <param name="userCreateBody">Necessary Data for registering a user</param>
             <returns>CreatedResult if a success UnprocessableEntityResult if not successful</returns>
         </member>

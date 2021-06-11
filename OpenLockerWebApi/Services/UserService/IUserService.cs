@@ -14,6 +14,13 @@ namespace OpenLockerWebApi.Services.UserService
         User GetUserByEmail(string emailAddress);
         User GetUserByUsername(string userName);
         User GetByEmailOrUsername(string emailAddress, string username);
+
+        bool AddRefreshToken(User user, RefreshToken refreshToken);
+
+        User GetUserFromRefreshToken(string token);
+
+        bool RemoveRefreshToken(User user, RefreshToken tokenToRemove);
+
         IEnumerable<User> GetAllUsers();
     }
 }

@@ -21,6 +21,20 @@ namespace OpenLockerWebApi.Services.UserService
             _userCollection = _database.GetCollection<User>("users");
         }
 
+        public bool AddRefreshToken(User user, RefreshToken refreshToken)
+        {
+            var updatedBuilder = Builders<User>.Update.Set<RefreshToken>(nameof(User.RefreshToken), refreshToken);
+            _userCollection.UpdateOneAsync(userItem => userItem.Username == user.Username, updatedBuilder);
+            return true;
+        }
+
+        public bool RemoveRefreshToken(User user, RefreshToken tokenToRemove)
+        {
+            var updatedBuilder = Builders<User>.Update.Set<RefreshToken>(nameof(User.RefreshToken), tokenToRemove);
+            _userCollection.UpdateOneAsync(userItem => userItem.Username == user.Username, updatedBuilder);
+            return true;
+        }
+
         public User CreateUser(User user)
         {
             _userCollection.InsertOne(user);
@@ -44,7 +58,7 @@ namespace OpenLockerWebApi.Services.UserService
 
         public User GetUserByEmail(string emailAddress)
         {
-            throw new NotImplementedException();
+            return _userCollection.Find<User>(user => user.EmailAddress == emailAddress).FirstOrDefault();
         }
 
         public User GetUserByUsername(string userName)
@@ -52,9 +66,17 @@ namespace OpenLockerWebApi.Services.UserService
             return _userCollection.Find<User>(user => user.Username == userName).FirstOrDefault();
         }
 
+        
+
         public void UpdateUser(User user)
         {
             throw new NotImplementedException();
+        }
+
+        public User GetUserFromRefreshToken(string token)
+        {
+            var user = _userCollection.Find(user => user.RefreshToken.Token == token).FirstOrDefault();
+            return user;
         }
     }
 }

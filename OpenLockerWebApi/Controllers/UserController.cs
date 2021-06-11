@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http;
 using OpenLockerWebApi.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace OpenLockerWebApi.Controllers
 {
@@ -59,9 +61,37 @@ namespace OpenLockerWebApi.Controllers
                 return new UnprocessableEntityObjectResult(failedResponse);
             };
             string passwordHash = HashGenerator.GenerateHash(user);
-            user.Password = passwordHash;
-            User insertedUser = _userService.CreateUser(user);
-            return new CreatedResult(insertedUser.id, _mapper.Map<UserRead>(user));
+
+            var jwtToken = JwtHelper.GenerateJwtToken(user);
+
+            var ipAddress = GetIpAddress();
+            var refreshToken = JwtHelper.GenerateRefreshToken(ipAddress);
+
+            var userToWrite = new User
+            {
+                Username = user.Username,
+                EmailAddress = user.EmailAddress,
+                Password = passwordHash,
+                RefreshToken = refreshToken
+            };
+
+            setTokenCookie(refreshToken.Token);
+
+            var insertedUser = _userService.CreateUser(userToWrite);
+
+            var response = new StandardResponse
+            {
+                Success = true,
+                Message = "User created successfully",
+                Data = new UserRead
+                {
+                    Username = user.Username,
+                    EmailAddress = user.EmailAddress,
+                    AccessToken = jwtToken,
+                    RefreshToken = refreshToken
+                }
+            };
+            return new CreatedResult(insertedUser.id, response);
         }
 
         /// <summary>
@@ -80,15 +110,17 @@ namespace OpenLockerWebApi.Controllers
             // return 403 if Password is not validated or else return Ok
             if (result)
             {
-                var userWithToken = _mapper.Map<UserRead>(user);
-
                 var jwtToken = JwtHelper.GenerateJwtToken(user);
-
-                var ipAddress = GetIpAddress();
-                var refreshToken = JwtHelper.GenerateRefreshToken(ipAddress);
+                var userWithToken = new UserRead
+                {
+                    Username = user.Username,
+                    EmailAddress = user.EmailAddress,
+                };
 
                 userWithToken.AccessToken = jwtToken;
-                userWithToken.RefreshToken = refreshToken;
+                userWithToken.RefreshToken = user.RefreshToken;
+
+                setTokenCookie(userWithToken.RefreshToken.Token);
 
                 var SuccessFulResponse = new StandardResponse
                 {
@@ -121,12 +153,72 @@ namespace OpenLockerWebApi.Controllers
             return new OkObjectResult(SuccessfulResponse);
         }
 
+        [AllowAnonymous]
+        [HttpPost("get-new-tokens")]
+        public ActionResult GetAccessToken()
+        {
+            var ipAddress = GetIpAddress();
+            var refreshToken = Request.Cookies["refreshToken"];
+            var user = _userService.GetUserFromRefreshToken(refreshToken);
+
+            if (user.RefreshToken.IsActive)
+            {
+                var jwtToken = JwtHelper.GenerateJwtToken(user);
+                UserRead userRead = new UserRead
+                {
+                    Username = user.Username,
+                    EmailAddress = user.EmailAddress,
+                    AccessToken = jwtToken,
+                    RefreshToken = user.RefreshToken
+                };
+
+                StandardResponse response = new StandardResponse
+                {
+                    Success = true,
+                    Message = "User Logged In Successfully",
+                    Data = userRead
+                };
+                return new OkObjectResult(response);
+            }
+            else
+            {
+                var newRefreshToken = JwtHelper.GenerateRefreshToken(ipAddress);
+                var jwtToken = JwtHelper.GenerateJwtToken(user);
+                UserRead userRead = new UserRead
+                {
+                    Username = user.Username,
+                    EmailAddress = user.EmailAddress,
+                    AccessToken = jwtToken,
+                    RefreshToken = newRefreshToken
+                };
+
+                StandardResponse response = new StandardResponse
+                {
+                    Success = true,
+                    Message = "User Logged In Successfully",
+                    Data = userRead
+                };
+                return new OkObjectResult(response);
+            }
+        }
+
+
         private string GetIpAddress()
         {
             if (Request.Headers.ContainsKey("X-Forwarded-For"))
                 return Request.Headers["X-Forwarded-For"];
             else
                 return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+        }
+
+        private void setTokenCookie(string token)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("refreshToken", token, cookieOptions);
         }
     }
 }

@@ -21,6 +21,8 @@ namespace OpenLockerWebApi.Models
 
         public string Password { get; set; }
 
+        public RefreshToken RefreshToken { get; set; }
+
         public override string ToString()
         {
             return $"{Username} {EmailAddress} {Password}";

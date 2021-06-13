@@ -66,6 +66,18 @@ namespace OpenLockerWebApi.Controllers
             return new OkObjectResult(response);
         }
 
+        [Authorize]
+        [HttpGet("all")]
+        public ActionResult GetAllFiles(){
+            User user = _userService.GetUserByUsername(User.FindFirstValue(ClaimTypes.Name));
+            var containerClient = _blobService.GetContainerForUser(user);
+            var response = new StandardResponse{
+                Success = true,
+                Data = _blobService.GetAllFiles(containerClient)
+            };
+            return new OkObjectResult(response);
+        }
+
         /// <summary>
         /// Get Upload URI for a file
         /// </summary>

@@ -63,6 +63,20 @@ namespace OpenLockerWebApi.Services.BlobService
             return client;
         }
 
+        public IEnumerable<File> GetAllFiles(BlobContainerClient client)
+        {
+            var blobItems = client.GetBlobs();
+            var fileItems = blobItems.Select(blob => new File
+            {
+                FileName = blob.Name,
+                ContentLength = blob.Properties.ContentLength ?? 0,
+                ContentType = blob.Properties.ContentType,
+                CreatedOn = blob.Properties.CreatedOn?.UtcDateTime ?? DateTime.MinValue,
+                LastModified = blob.Properties.LastModified?.UtcDateTime ?? DateTime.MinValue
+            });
+            return fileItems;
+        }
+
         public Uri GetDownloadUrl(BlobContainerClient client, string fileName)
         {
             var blobClient = client.GetBlobClient(fileName);

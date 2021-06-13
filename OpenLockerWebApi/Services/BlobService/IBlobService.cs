@@ -38,6 +38,13 @@ namespace OpenLockerWebApi.Services.BlobService
         HierarchealContent GetFiles(BlobContainerClient client,string prefix = "");
 
         /// <summary>
+        /// Get all the files in your container
+        /// </summary>
+        /// <param name="client">Blob Container Client for the appropriate container</param>
+        /// <returns>List of files</returns>
+        IEnumerable<File> GetAllFiles(BlobContainerClient client);
+
+        /// <summary>
         /// Generates SAS token for the file with READ perms and returns url to download the
         /// file
         /// </summary>

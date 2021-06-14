@@ -138,7 +138,7 @@ namespace OpenLockerWebApi.Controllers
                 };
 
                 userWithToken.AccessToken = jwtToken;
-                if(user.RefreshToken.IsExpired)
+                if(user.RefreshToken != null && user.RefreshToken.IsExpired)
                 {
                     var ipAddress = GetIpAddress();
                     var newRefreshToken = JwtHelper.GenerateRefreshToken(ipAddress);

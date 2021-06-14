@@ -53,7 +53,7 @@ namespace OpenLockerWebApi.Controllers
         /// </remarks>
         /// <returns></returns>
         [Authorize]
-        [HttpGet("")]
+        [HttpPost("")]
         public ActionResult GetFiles(GetFilesDto getFilesDto)
         {
             User user = _userService.GetUserByUsername(User.FindFirstValue(ClaimTypes.Name));

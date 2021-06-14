@@ -98,7 +98,22 @@ namespace OpenLockerWebApi.Controllers
             User user = _userService.GetUserByUsername(User.FindFirstValue(ClaimTypes.Name));
             var containerClient = _blobService.GetContainerForUser(user);
             var uploadUri = _blobService.GetUploadSasUri(client: containerClient, fileName: uploadFileUriProps.FileName);
-            return new OkObjectResult($"{uploadUri.Scheme}://{uploadUri.Host}:{uploadUri.Port}{uploadUri.LocalPath}{uploadUri.Query}");
+            if (uploadUri != null)
+            {
+                var result = new StandardResponse
+                {
+                    Success = true,
+                    Data = $"{uploadUri.Scheme}://{uploadUri.Host}:{uploadUri.Port}{uploadUri.LocalPath}{uploadUri.Query}"
+                };
+                return new OkObjectResult(result);
+            }
+
+            var failedResult = new StandardResponse
+            {
+                Success = false,
+                Message = "Creation of the url failed. Check whether the file really exists or you passed correct details"
+            };
+            return new BadRequestObjectResult(failedResult);
         }
 
         /// <summary>

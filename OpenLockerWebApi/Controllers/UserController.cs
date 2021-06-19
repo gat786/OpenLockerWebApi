@@ -64,13 +64,23 @@ namespace OpenLockerWebApi.Controllers
         public ActionResult<UserRead> Register(UserCreate userCreateBody)
         {
             var user = _mapper.Map<User>(userCreateBody);
-            var userFound = _userService.GetByEmailOrUsername(emailAddress: user.EmailAddress, username: user.Username);
+            var userFound = _userService.GetUserByEmail(emailAddress: userCreateBody.EmailAddress);
+            //var userFound = _userService.GetByEmailOrUsername(emailAddress: user.EmailAddress, username: user.Username);
             // return a 422 if username or email address is already taken
             if (userFound != null)
             {
-                var failedResponse = new StandardResponse { Success = false, Message = "Username or Email Address is already taken" };
+                var failedResponse = new StandardResponse { Success = false, Message = "Email Address is already taken" };
                 return new UnprocessableEntityObjectResult(failedResponse);
             };
+
+            userFound = _userService.GetUserByEmail(emailAddress: userCreateBody.EmailAddress);
+
+            if (userFound != null)
+            {
+                var failedResponse = new StandardResponse { Success = false, Message = "Username is already taken" };
+                return new UnprocessableEntityObjectResult(failedResponse);
+            };
+
             string passwordHash = HashGenerator.GenerateHash(user);
 
             var jwtToken = JwtHelper.GenerateJwtToken(user);

@@ -73,7 +73,7 @@ namespace OpenLockerWebApi.Controllers
                 return new UnprocessableEntityObjectResult(failedResponse);
             };
 
-            userFound = _userService.GetUserByEmail(emailAddress: userCreateBody.EmailAddress);
+            userFound = _userService.GetUserByUsername(userName: userCreateBody.Username);
 
             if (userFound != null)
             {
